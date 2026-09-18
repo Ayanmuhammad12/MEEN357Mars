@@ -6,7 +6,7 @@ def get_mass():
     return
 
 
-testing
+
 
 def get_gear_ratio():
     #Returns the speed reduction ratio
