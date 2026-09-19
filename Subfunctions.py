@@ -77,9 +77,9 @@ def get_gear_ratio(speed_reducer):
 def tau_dcmotor(omega,motor):
     #Returns the motor shaft torque given shaft speed and motor specs
     if type(motor) != dict:
-            raise Exception('Input motor must be a dict')
+        raise Exception('Input motor must be a dict')
     if not isinstance(omega, (int, float, np.ndarray)):
-         raise Exception('Input omega must be a scalar or a numpy array')
+        raise Exception('Input omega must be a scalar or a numpy array')
 
     tau_stall = motor['torque_stall']
     tau_noload = motor['torque_noload']
@@ -103,9 +103,22 @@ def tau_dcmotor(omega,motor):
     return tau
 
 
-def F_drive():
+def F_drive(omega,rover):
     #Returns the force applied to the rover by the drive system given drive system and shaft speed
-    return
+    if type(rover) != dict:
+        raise Exception('Input rover must be a dict')
+    if not isinstance(omega, (int, float, np.ndarray)):
+        raise Exception('Input omega must be a scalar or a numpy array')
+
+    motor = rover['wheel_assembly']['motor']
+    speed_reducer = rover['wheel_assembly']['speed_reducer']
+    r = rover['wheel_assembly']['wheel']['radius']
+    Ng = get_gear_ratio(speed_reducer)
+    tau = tau_dcmotor(omega,motor)
+
+    Fd = 6 * (Ng * tau)/r
+
+    return Fd
  
 
 def F_gravity():
@@ -123,4 +136,3 @@ def F_rolling():
 def F_net():
     # magnitude of net force acting on the rover
     return
-
