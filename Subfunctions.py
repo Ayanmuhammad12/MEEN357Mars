@@ -173,8 +173,27 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     
     return Frr
 
-def F_net():
+def F_net(omega, terrain_angle, rover, planet, Crr):
     # magnitude of net force acting on the rover
-    return
+    if not isinstance(omega, (float, int, np.ndarray)):
+        raise Exception('F-net - Omega must be a scalar or numpy array')
+    if not isinstance(terrain_angle,(float, int, np.ndarray)):
+        raise Exception('F-net - terrain angle must be a scalar or numpy array')
+    if np.shape(np.array(omega)) != np.shape(np.array(terrain_angle)):
+        raise Exception('F-net - omega and terrain angle must have the same shape')
+    if np.any(np.array(terrain_angle) > 75) or  np.any(np.array(terrain_angle) < -75):
+        raise Exception('F-net - terrain angle must be between -75 and 75 degrees')
+    if type(rover) != dict:
+        raise Exception('F-net - Input rover must be a dict')
+    if type(planet) != dict:
+        raise Exception('F-net - Input planet must be a dict')
+    if not (isinstance(Crr, (int, float)) and Crr > 0):
+        raise Exception('F_net - Crr must be a positive scalar')
 
+    Fd = F_drive(omega,rover)
+    Fgt = F_gravity(terrain_angle, rover, planet)
+    Frr = F_rolling(omega, terrain_angle, rover, planet, Crr)
 
+    Fnet = Fd + Fgt + Frr
+
+    return Fnet
