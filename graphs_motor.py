@@ -1,7 +1,7 @@
 # graphs_motor.py
 import numpy as np
 import matplotlib.pyplot as plt
-from Subfunctions import tau_dcmotor
+from subfunctions import tau_dcmotor
 
 motor = {'torque_stall': 170, 'torque_noload': 0, 'speed_noload': 3.80, 'mass': 5.0}
 omega = np.linspace(0, motor['speed_noload'], 100)
