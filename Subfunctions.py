@@ -74,9 +74,33 @@ def get_gear_ratio(speed_reducer):
     return Ng
 
 
-def tau_dcmotor():
+def tau_dcmotor(omega,motor):
     #Returns the motor shaft torque given shaft speed and motor specs
-    return
+    if type(motor) != dict:
+            raise Exception('Input motor must be a dict')
+    if not isinstance(omega, (int, float, np.ndarray)):
+         raise Exception('Input omega must be a scalar or a numpy array')
+
+    tau_stall = motor['torque_stall']
+    tau_noload = motor['torque_noload']
+    omega_noload = motor['speed_noload']
+    slope = ((tau_stall-tau_noload)/omega_noload)
+
+    #torque if scalar
+    if isinstance(omega, (int, float)):
+         if omega < 0:
+              return float(tau_stall)
+         elif omega > omega_noload:
+              return 0.0
+         else:
+              return float(tau_stall - (slope * omega))
+
+    #torque for array
+    tau = tau_stall - (slope * omega)
+    tau[omega < 0] = tau_stall
+    tau [omega > omega_noload] = 0
+
+    return tau
 
 
 def F_drive():
