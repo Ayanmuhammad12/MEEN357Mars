@@ -2,6 +2,7 @@
 ### SIGN CONVENTION: POSITIVE (FORWARD OR DOWNHILL) ; NEGATIVE (BACKWARD OR UPHILL)###
 import numpy as np
 from math import erf
+from scipy.special import erf
 
 #defining rover dict for testing
 # --- Rover component dicts ---
@@ -43,7 +44,7 @@ planet = {'g': 3.72}   # m/s^2, Mars gravity
 def get_mass(rover):
     #Computes total mass of rover
     if type(rover) != dict:
-        raise Exception('Input rover must be a dict')
+        raise Exception('get_mass - Input rover must be a dict')
     
     #finding mass
     chassis_mass = rover['chassis']['mass']
@@ -61,11 +62,11 @@ def get_mass(rover):
 def get_gear_ratio(speed_reducer):
     #Returns the speed reduction ratio
     if type(speed_reducer) != dict:
-            raise Exception('Input speed_reducer must be a dict')
+            raise Exception('get_gear_reducer - Input speed_reducer must be a dict')
 
     #checing if 'type' = 'reverted'
     if speed_reducer['type'].lower() != 'reverted':
-        raise Exception('type of reducer is not what is expected')
+        raise Exception('get_gear_reducer - type of reducer is not what is expected')
 
     #reducer
     pinion_diam = speed_reducer['diam_pinion']
@@ -77,9 +78,9 @@ def get_gear_ratio(speed_reducer):
 def tau_dcmotor(omega,motor):
     #Returns the motor shaft torque given shaft speed and motor specs
     if type(motor) != dict:
-        raise Exception('Input motor must be a dict')
+        raise Exception('Tau_dcmotor - Input motor must be a dict')
     if not isinstance(omega, (int, float, np.ndarray)):
-        raise Exception('Input omega must be a scalar or a numpy array')
+        raise Exception('Tau_dcmotor - Input omega must be a scalar or a numpy array')
 
     tau_stall = motor['torque_stall']
     tau_noload = motor['torque_noload']
@@ -106,9 +107,9 @@ def tau_dcmotor(omega,motor):
 def F_drive(omega,rover):
     #Returns the force applied to the rover by the drive system given drive system and shaft speed
     if type(rover) != dict:
-        raise Exception('Input rover must be a dict')
+        raise Exception('F_drive - Input rover must be a dict')
     if not isinstance(omega, (int, float, np.ndarray)):
-        raise Exception('Input omega must be a scalar or a numpy array')
+        raise Exception('F_drive - Input omega must be a scalar or a numpy array')
 
     motor = rover['wheel_assembly']['motor']
     speed_reducer = rover['wheel_assembly']['speed_reducer']
@@ -126,11 +127,11 @@ def F_gravity(terrain_angle, rover, planet):
 translational motion due to gravity as a function of terrain inclination angle and rover
 properties'''
     if not isinstance(terrain_angle, (int, float, np.ndarray)):
-        raise Exception('Input terrain angle must be a scalar or a numpy array')
+        raise Exception('F_gravity - Input terrain angle must be a scalar or a numpy array')
     if np.any(np.array(terrain_angle) > 75) or  np.any(np.array(terrain_angle) < -75):
-        raise Exception('Terrain angle must be between -75 and 75 degrees')
+        raise Exception('F_gravity - Terrain angle must be between -75 and 75 degrees')
     if type(rover) != dict or type(planet) != dict:
-            raise Exception('Input rover and planet must both be dict')
+            raise Exception('F_gravity - Input rover and planet must both be dict')
     m = get_mass(rover)
     g = planet['g']
 
@@ -139,12 +140,41 @@ properties'''
     
     return Fgt
 
-def F_rolling():
+def F_rolling(omega, terrain_angle, rover, planet, Crr):
     #magnitude of force component due to rolling resistances given the terrain inclination angle, rover properties, and a
 #rolling resistance coefficient
+    if not isinstance(omega, (float, int, np.ndarray)):
+        raise Exception('F_rolling - Omega must be a scalar or numpy array')
+    if not isinstance(terrain_angle,(float, int, np.ndarray)):
+         raise Exception('F_rolling - terrain angle must be a scalar or numpy array')
+    if np.shape(np.array(omega)) != np.shape(np.array(terrain_angle)):
+         raise Exception('F_rolling - omega and terrain angle must have the same shape')
+    if np.any(np.array(terrain_angle) > 75) or  np.any(np.array(terrain_angle) < -75):
+        raise Exception('F_rolling - terrain angle must be between -75 and 75 degrees')
+    if type(rover) != dict:
+        raise Exception('F-rolling - Input rover must be a dict')
+    if type(planet) != dict:
+            raise Exception('F-rolling - Input planet must be a dict')
+    if not (isinstance(Crr, (int, float)) and Crr > 0):
+        raise Exception('F_rolling - Crr must be a positive scalar')
+    
+    
+    m = get_mass(rover)
+    g = planet['g']
+    Ng = get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
+    r = rover['wheel_assembly']['wheel']['radius']
 
-    return
+    radang = np.deg2rad(terrain_angle)
+
+    v_rover = (omega/Ng) * r
+
+    Frr_simple = m * g * np.cos(radang) * Crr
+    Frr = -erf(40*v_rover) * Frr_simple
+    
+    return Frr
 
 def F_net():
     # magnitude of net force acting on the rover
     return
+
+
