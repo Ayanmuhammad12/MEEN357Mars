@@ -121,11 +121,23 @@ def F_drive(omega,rover):
     return Fd
  
 
-def F_gravity():
-    #magnitude of the force component acting on the rover in the direction of its
-#translational motion due to gravity as a function of terrain inclination angle and rover
-#properties
-    return
+def F_gravity(terrain_angle, rover, planet):
+    '''magnitude of the force component acting on the rover in the direction of its
+translational motion due to gravity as a function of terrain inclination angle and rover
+properties'''
+    if not isinstance(terrain_angle, (int, float, np.ndarray)):
+        raise Exception('Input terrain angle must be a scalar or a numpy array')
+    if np.any(np.array(terrain_angle) > 75) or  np.any(np.array(terrain_angle) < -75):
+        raise Exception('Terrain angle must be between -75 and 75 degrees')
+    if type(rover) != dict or type(planet) != dict:
+            raise Exception('Input rover and planet must both be dict')
+    m = get_mass(rover)
+    g = planet['g']
+
+    radang = np.deg2rad(terrain_angle)
+    Fgt = -m * g * np.sin(radang)
+    
+    return Fgt
 
 def F_rolling():
     #magnitude of force component due to rolling resistances given the terrain inclination angle, rover properties, and a
