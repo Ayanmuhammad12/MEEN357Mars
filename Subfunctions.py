@@ -58,9 +58,20 @@ def get_mass(rover):
 
 
 
-def get_gear_ratio():
+def get_gear_ratio(speed_reducer):
     #Returns the speed reduction ratio
-    return
+    if type(speed_reducer) != dict:
+            raise Exception('Input speed_reducer must be a dict')
+
+    #checing if 'type' = 'reverted'
+    if speed_reducer['type'].lower() != 'reverted':
+        raise Exception('type of reducer is not what is expected')
+
+    #reducer
+    pinion_diam = speed_reducer['diam_pinion']
+    gear_diam = speed_reducer['diam_gear']
+    Ng = (gear_diam/pinion_diam)**2
+    return Ng
 
 
 def tau_dcmotor():
@@ -89,5 +100,3 @@ def F_net():
     # magnitude of net force acting on the rover
     return
 
-
-print(get_mass(rover))
