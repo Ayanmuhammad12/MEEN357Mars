@@ -29,5 +29,5 @@ axes[2].set_ylabel('Motor Power [W]')
 axes[2].set_title('Power vs Speed')
 
 fig.tight_layout()
-fig.savefig('grpahs_motor.png')
+fig.savefig('graphs_motor.png')
 plt.close('all')
