@@ -4,43 +4,6 @@ import numpy as np
 from math import erf
 from scipy.special import erf
 
-#defining rover dict for testing
-# --- Rover component dicts ---
-
-motor = {
-    'torque_stall':  170,    # Nm
-    'torque_noload':   0,    # Nm
-    'speed_noload':  3.80,   # rad/s
-    'mass':          5.0     # kg
-}
-wheel = {
-    'radius': 0.30,   # m
-    'mass':   1.0     # kg
-}
-speed_reducer = {
-    'type':        'reverted',
-    'diam_pinion': 0.04,   # m
-    'diam_gear':   0.07,   # m
-    'mass':        1.5     # kg
-}
-wheel_assembly = {
-    'wheel':         wheel,
-    'speed_reducer': speed_reducer,
-    'motor':         motor
-}
-chassis         = {'mass': 659}   # kg
-science_payload = {'mass':  75}   # kg
-power_subsys    = {'mass':  90}   # kg
-rover = {
-    'wheel_assembly':  wheel_assembly,
-    'chassis':         chassis,
-    'science_payload': science_payload,
-    'power_subsys':    power_subsys
-}
-# --- Planet dict (separate from rover) ---
-planet = {'g': 3.72}   # m/s^2, Mars gravity
-
-
 def get_mass(rover):
     #Computes total mass of rover
     if type(rover) != dict:
@@ -197,3 +160,4 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     Fnet = Fd + Fgt + Frr
 
     return Fnet
+
