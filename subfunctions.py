@@ -40,11 +40,11 @@ def get_gear_ratio(speed_reducer):
 def tau_dcmotor(omega,motor):
     #Returns the motor shaft torque given shaft speed and motor specs
     if type(motor) != dict:
-        raise Exception('Tau_dcmotor - Input motor must be a dict')
+        raise Exception('tau_dcmotor - Input motor must be a dict')
     if not isinstance(omega, (int, float, np.ndarray)):
-        raise Exception('Tau_dcmotor - Input omega must be a scalar or a numpy array')
+        raise Exception('tau_dcmotor - Input omega must be a scalar or a numpy array')
     if isinstance(omega, np.ndarray) and omega.ndim != 1:
-        raise Exception('Tau_dcmotor - omega array must be 1D')
+        raise Exception('tau_dcmotor - omega array must be a 1D numpy array or a scalar')
 
     tau_stall = motor['torque_stall']
     tau_noload = motor['torque_noload']
