@@ -43,6 +43,8 @@ def tau_dcmotor(omega,motor):
         raise Exception('Tau_dcmotor - Input motor must be a dict')
     if not isinstance(omega, (int, float, np.ndarray)):
         raise Exception('Tau_dcmotor - Input omega must be a scalar or a numpy array')
+    if isinstance(omega, np.ndarray) and omega.ndim != 1:
+        raise Exception('Tau_dcmotor - omega array must be 1D')
 
     tau_stall = motor['torque_stall']
     tau_noload = motor['torque_noload']
